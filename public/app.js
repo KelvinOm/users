@@ -498,17 +498,19 @@ var UsersList = function () {
             var link = event.target.closest('a');
             var selectedUser = void 0;
 
-            for (var i = 0; i < this.elemCollection.length; i++) {
-                this.elemCollection[i].classList.remove('active');
-            }
-
             if (link && this._elem.contains(link)) {
+
+                for (var i = 0; i < this.elemCollection.length; i++) {
+                    this.elemCollection[i].classList.remove('active');
+                }
+
                 for (var _i = 0; _i <= this.elemCollection.length - 1; _i++) {
                     if (this.elemCollection[_i].querySelector('a').innerHTML == link.innerHTML) {
                         selectedUser = this._users[_i];
                         this.elemCollection[_i].classList.add('active');
                     }
                 }
+
                 this._elem.dispatchEvent(new CustomEvent('user-select', {
                     bubble: true,
                     detail: {
@@ -570,7 +572,7 @@ exports.default = UsersList;
 
 var pug = __webpack_require__(0);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИзменить данные пользователя\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cform\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"name\""+pug.attr("value", item.name, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EФамилия\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"surname\""+pug.attr("value", item.surname, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EВозраст\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"age\""+pug.attr("value", item.age, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИнформация\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cform\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"name\""+pug.attr("value", item.name, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EФамилия\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"surname\""+pug.attr("value", item.surname, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EВозраст\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"age\""+pug.attr("value", item.age, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -579,7 +581,7 @@ module.exports = template;
 
 var pug = __webpack_require__(0);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EСписок пользователей\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cul class=\"nav nav-pills nav-stacked\"\u003E";
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cul class=\"nav nav-pills nav-stacked\"\u003E";
 // iterate items
 ;(function(){
   var $$obj = items;

@@ -19,17 +19,19 @@ export default class UsersList {
         let link = event.target.closest('a');
         let selectedUser;
 
-        for (var i = 0; i < this.elemCollection.length; i++) {
-            this.elemCollection[i].classList.remove('active');
-        }
-
         if (link && this._elem.contains(link)) {
+            
+            for (var i = 0; i < this.elemCollection.length; i++) {
+                this.elemCollection[i].classList.remove('active');
+            }
+
             for (let i = 0; i <= this.elemCollection.length - 1; i++) {
                 if (this.elemCollection[i].querySelector('a').innerHTML == link.innerHTML) {
                     selectedUser = this._users[i];
                     this.elemCollection[i].classList.add('active');
                 }
             }
+            
             this._elem.dispatchEvent(new CustomEvent('user-select', {
                 bubble: true,
                 detail: {
