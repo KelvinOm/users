@@ -1,0 +1,32 @@
+.user-form.col-lg-9
+    .panel.panel-default
+        .panel-heading Изменить данные пользователя
+        .panel-body
+            form
+                .form-group
+                    label(class='col-2 col-form-label') Имя
+                    input(
+                          type='text'
+                          name='name'
+                          value=item.name
+                          class='userform__input form-control'
+                        )
+                .form-group
+                    label(class='col-2 col-form-label') Фамилия
+                    input(
+                          type='text'
+                          name='surname'
+                          value=item.surname
+                          class='userform__input form-control'
+                        )
+                .form-group
+                    label(class='col-2 col-form-label') Возраст
+                    input(
+                          type='text'
+                          name='age'
+                          value=item.age
+                          class='userform__input form-control'
+                        )
+                .userform__buttons.text-right
+                    button(class='userform__delete-button btn btn-default btn-danger') Удалить
+                    button(class='userform__save-button btn btn-default btn-success') Сохранить

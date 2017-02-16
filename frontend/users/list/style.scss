@@ -1,0 +1,23 @@
+// .menu ul {
+//   margin: 0;
+//   max-height: 0;
+//   overflow: hidden;
+//   list-style: none;
+//   padding-left: 20px;
+//   transition: all 1s;
+// }
+// .menu .title {
+//   font-size: 18px;
+//   cursor: pointer;
+// }
+// .menu .title:before {
+//   content: '\25B6   ';
+//   font-size: 80%;
+//   color: #008000;
+// }
+// .menu.open .title:before {
+//   content: '\25BC   ';
+// }
+// .menu.open ul {
+//   max-height: 200px;
+// }
