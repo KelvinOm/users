@@ -481,9 +481,12 @@ var UsersList = function () {
 
         _classCallCheck(this, UsersList);
 
-        this._items = users;
+        this._users = users;
 
         this._render();
+
+        this.elemCollection = this._elem.querySelectorAll('li');
+        this.elemCollection[0].classList.add('active');
 
         this._elem.onclick = this.onClick.bind(this);
     }
@@ -492,12 +495,18 @@ var UsersList = function () {
         key: 'onClick',
         value: function onClick(event) {
             event.preventDefault();
-            var link = event.target.closest('li');
+            var link = event.target.closest('a');
             var selectedUser = void 0;
+
+            for (var i = 0; i < this.elemCollection.length; i++) {
+                this.elemCollection[i].classList.remove('active');
+            }
+
             if (link && this._elem.contains(link)) {
-                for (var i = 0; i <= this._items.length - 1; i++) {
-                    if (this._items[i].name === link.innerHTML) {
-                        selectedUser = this._items[i];
+                for (var _i = 0; _i <= this.elemCollection.length - 1; _i++) {
+                    if (this.elemCollection[_i].querySelector('a').innerHTML == link.innerHTML) {
+                        selectedUser = this._users[_i];
+                        this.elemCollection[_i].classList.add('active');
                     }
                 }
                 this._elem.dispatchEvent(new CustomEvent('user-select', {
@@ -511,14 +520,13 @@ var UsersList = function () {
     }, {
         key: 'updateList',
         value: function updateList(user, action) {
-            var userCollection = this._elem.querySelectorAll('li');
-            for (var i = 0; i < this._items.length; i++) {
-                if (this._items[i].id === user.id) {
+            for (var i = 0; i < this._users.length; i++) {
+                if (this._users[i].id === user.id) {
                     if (action === 'delete') {
-                        userCollection[i].remove();
+                        this.elemCollection[i].remove();
                     }
                     if (action === 'update') {
-                        userCollection[i].innerHTML = user.name;
+                        this.elemCollection[i].querySelector('a').innerHTML = user.name + ' ' + user.surname;
                     }
                 }
             }
@@ -528,7 +536,7 @@ var UsersList = function () {
         value: function _render() {
             var tmp = document.createElement('div');
             tmp.innerHTML = (0, _template2.default)({
-                items: this._items
+                items: this._users
             });
             this._elem = tmp.firstElementChild;
         }
@@ -578,14 +586,14 @@ function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var l
   if ('number' == typeof $$obj.length) {
       for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
         var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca\u003E" + (pug.escape(null == (pug_interp = item.name) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+pug_html = pug_html + "\u003Cli\u003E\u003Ca href=\"#\"\u003E" + (pug.escape(null == (pug_interp = `${item.name} ${item.surname}`) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
       }
   } else {
     var $$l = 0;
     for (var pug_index0 in $$obj) {
       $$l++;
       var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca\u003E" + (pug.escape(null == (pug_interp = item.name) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+pug_html = pug_html + "\u003Cli\u003E\u003Ca href=\"#\"\u003E" + (pug.escape(null == (pug_interp = `${item.name} ${item.surname}`) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
     }
   }
 }).call(this);

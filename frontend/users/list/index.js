@@ -4,21 +4,30 @@ import './style.scss';
 export default class UsersList {
 
     constructor({ users }) {
-        this._items = users;
+        this._users = users;
 
         this._render();
+
+        this.elemCollection = this._elem.querySelectorAll('li');
+        this.elemCollection[0].classList.add('active');
 
         this._elem.onclick = this.onClick.bind(this);
     }
 
     onClick(event) {
         event.preventDefault();
-        let link = event.target.closest('li');
+        let link = event.target.closest('a');
         let selectedUser;
+
+        for (var i = 0; i < this.elemCollection.length; i++) {
+            this.elemCollection[i].classList.remove('active');
+        }
+
         if (link && this._elem.contains(link)) {
-            for (let i = 0; i <= this._items.length - 1; i++) {
-                if (this._items[i].name === link.innerHTML) {
-                    selectedUser = this._items[i];
+            for (let i = 0; i <= this.elemCollection.length - 1; i++) {
+                if (this.elemCollection[i].querySelector('a').innerHTML == link.innerHTML) {
+                    selectedUser = this._users[i];
+                    this.elemCollection[i].classList.add('active');
                 }
             }
             this._elem.dispatchEvent(new CustomEvent('user-select', {
@@ -31,14 +40,13 @@ export default class UsersList {
     }
 
     updateList(user, action) {
-        let userCollection = this._elem.querySelectorAll('li');
-        for (var i = 0; i < this._items.length; i++) {
-            if (this._items[i].id === user.id) {
+        for (var i = 0; i < this._users.length; i++) {
+            if (this._users[i].id === user.id) {
                 if (action === 'delete') {
-                    userCollection[i].remove();
+                    this.elemCollection[i].remove();
                 }
                 if (action === 'update') {
-                    userCollection[i].innerHTML = user.name;
+                    this.elemCollection[i].querySelector('a').innerHTML = `${user.name} ${user.surname}`;
                 }
             }
         }
@@ -47,7 +55,7 @@ export default class UsersList {
     _render() {
         let tmp = document.createElement('div');
         tmp.innerHTML = template({
-            items: this._items
+            items: this._users
         });
         this._elem = tmp.firstElementChild;
     }
