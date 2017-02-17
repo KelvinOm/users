@@ -1,4 +1,5 @@
 import template from "./template.pug";
+import userTemplate from "./user.pug";
 import './style.scss';
 
 export default class UsersList {
@@ -8,11 +9,22 @@ export default class UsersList {
 
         this._render();
 
-        this.elemCollection = this._elem.querySelectorAll('li');
-        this.elemCollection[0].classList.add('active');
+        this.elemCollection = this._elem.getElementsByTagName('li');
 
+        if (this.elemCollection[0]) {
+            this.elemCollection[0].classList.add('active');
+        }
+        this._elem.querySelector('[data-attach-add]').onclick = this.onAddClick.bind(this);
         this._elem.onclick = this.onClick.bind(this);
     }
+
+    onAddClick(event) {
+        this._elem.dispatchEvent(new CustomEvent('user-add', {
+            bubbles: true
+        }));
+        event.preventDefault();
+    }
+
 
     onClick(event) {
         event.preventDefault();
@@ -33,7 +45,7 @@ export default class UsersList {
             }
             
             this._elem.dispatchEvent(new CustomEvent('user-select', {
-                bubble: true,
+                bubbles: true,
                 detail: {
                     value: selectedUser
                 }
@@ -43,12 +55,15 @@ export default class UsersList {
 
     updateList(user, action) {
         for (var i = 0; i < this._users.length; i++) {
-            if (this._users[i].id === user.id) {
+            if (this._users[i] === user) {
                 if (action === 'delete') {
                     this.elemCollection[i].remove();
                 }
                 if (action === 'update') {
-                    this.elemCollection[i].querySelector('a').innerHTML = `${user.name} ${user.surname}`;
+                    this.elemCollection[i].querySelector('a').innerHTML = `${user.fullName} ${user.email}`;
+                }
+                if (action === 'add') {
+                    this._elem.querySelector('ul').insertAdjacentHTML('beforeend', userTemplate({item: user}));
                 }
             }
         }

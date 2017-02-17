@@ -7,21 +7,27 @@ export default class UserForm {
         this._users = users;
         this._currentUser = users[0];
 
+
         this._render();
 
-        this.deleteButton = this._elem.querySelector('.userform__delete-button');
-        this.saveButton = this._elem.querySelector('.userform__save-button');
-
-        this.deleteButton.onclick = this.onClickDeleteButton.bind(this);
-        this.saveButton.onclick = this.onClickSaveButton.bind(this);
+        this._elem.addEventListener('click', e => {
+            if (e.target.classList.contains('userform__delete-button')) {
+                this.onClickDeleteButton(e);
+                e.preventDefault();
+            } else if(e.target.classList.contains('userform__save-button')) {
+                this.onClickSaveButton(e);
+                e.preventDefault();
+            }
+        });
     }
 
     _render() {
-        let tmp = document.createElement('div');
-        tmp.innerHTML = template({
+        if (!this._elem) {
+            this._elem = document.createElement('div');
+        }
+        this._elem.innerHTML = template({
             item: this._currentUser
         });
-        this._elem = tmp.firstElementChild;
     }
 
     _deleteUser() {
@@ -36,9 +42,8 @@ export default class UserForm {
     }
 
     _saveUser() {
-        this._currentUser.name = this._elem.querySelector("input[name^='name']").value;
-        this._currentUser.surname = this._elem.querySelector("input[name^='surname']").value;
-        this._currentUser.age = this._elem.querySelector("input[name^='age']").value;
+        this._currentUser.fullName = this._elem.querySelector("input[name^='fullName']").value;
+        this._currentUser.email = this._elem.querySelector("input[name^='email']").value;
 
         this._elem.dispatchEvent(new CustomEvent('save-user', {
             bubble: true,
@@ -60,17 +65,8 @@ export default class UserForm {
 
     openUser(selectedUser) {
         this._currentUser = selectedUser;
-
-        if (selectedUser) {
-            this._elem.querySelector("input[name^='name']").value = selectedUser.name;
-            this._elem.querySelector("input[name^='surname']").value = selectedUser.surname;
-            this._elem.querySelector("input[name^='age']").value = selectedUser.age;
-        } else {
-            this._elem.querySelector("input[name^='name']").value = "";
-            this._elem.querySelector("input[name^='surname']").value = "";
-            this._elem.querySelector("input[name^='age']").value = "";
-        }
-
+        this._render();
+        this._elem.querySelector('input').focus();
     }
 
     getUsersList() {

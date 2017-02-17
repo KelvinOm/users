@@ -3,40 +3,56 @@
 import UsersList from './users/list/';
 import UserForm from './users/form/';
 
-let users = [{
-    "id": "1",
-    "name": "Иван",
-    "surname": "Иванов",
-    "age": "28 лет",
-}, {
-    "id": "2",
-    "name": "Александр",
-    "surname": "Тарасов",
-    "age": "20 лет",
-}, {
-    "id": "3",
-    "name": "Петр",
-    "surname": "Сидоров",
-    "age": "33 года",
-}];
+export default class App {
+    constructor({elem}) {
+        this._elem = elem;
 
-let container = document.body.querySelector('.vertical-center-row');
+        this.users = [];
 
-let usersList = new UsersList({ users });
-container.appendChild(usersList.getElem());
+        this._render();
+    }
 
-let userForm = new UserForm({ users });
-container.appendChild(userForm.getElem());
+    onUsersListAdd() {
+        let user = {
+            fullName: '',
+            email: ''
+        };
 
-usersList.getElem().addEventListener('user-select', function(event) {
-    let selectedUser = event.detail.value;
-    userForm.openUser(selectedUser);
-});
+        this.usersForm.openUser(user);
+    }
 
-userForm.getElem().addEventListener('delete-user', function(event) {
-    usersList.updateList(event.detail.value, 'delete');
-});
+    _render() {
 
-userForm.getElem().addEventListener('save-user', function(event) {
-    usersList.updateList(event.detail.value, 'update');
-});
+        let container = this._elem.querySelector('.vertical-center-row');
+
+        let usersList = this.usersList = new UsersList({ users: this.users });
+        container.appendChild(usersList.getElem());
+
+
+
+        let userForm = this.usersForm = new UserForm({ users: this.users });
+        container.appendChild(userForm.getElem());
+
+        usersList.getElem().addEventListener('user-select', function(event) {
+            let selectedUser = event.detail.value;
+            userForm.openUser(selectedUser);
+        });
+
+        usersList.getElem().addEventListener('user-add', this.onUsersListAdd.bind(this));
+
+        userForm.getElem().addEventListener('delete-user', function(event) {
+            usersList.updateList(event.detail.value, 'delete');
+        });
+
+        userForm.getElem().addEventListener('save-user', (event) => {
+            let user = event.detail.value;
+            if (!this.users.includes(user)) {
+                this.users.push(user);
+                usersList.updateList(user, 'add');
+            } else {
+                usersList.updateList(user, 'update');
+            }
+        });
+
+    }
+}

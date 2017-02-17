@@ -63,11 +63,20 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var pug = __webpack_require__(1);
+
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cli\u003E\u003Ca href=\"#\"\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
+module.exports = template;
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -301,7 +310,7 @@ function pug_rethrow(err, filename, lineno, str){
     throw err;
   }
   try {
-    str = str || __webpack_require__(7).readFileSync(filename, 'utf8')
+    str = str || __webpack_require__(9).readFileSync(filename, 'utf8')
   } catch (ex) {
     pug_rethrow(err, null, lineno)
   }
@@ -328,7 +337,7 @@ function pug_rethrow(err, filename, lineno, str){
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -340,11 +349,100 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _template = __webpack_require__(5);
+var _list = __webpack_require__(4);
+
+var _list2 = _interopRequireDefault(_list);
+
+var _form = __webpack_require__(3);
+
+var _form2 = _interopRequireDefault(_form);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var App = function () {
+    function App(_ref) {
+        var elem = _ref.elem;
+
+        _classCallCheck(this, App);
+
+        this._elem = elem;
+
+        this.users = [];
+
+        this._render();
+    }
+
+    _createClass(App, [{
+        key: 'onUsersListAdd',
+        value: function onUsersListAdd() {
+            var user = {
+                fullName: '',
+                email: ''
+            };
+
+            this.usersForm.openUser(user);
+        }
+    }, {
+        key: '_render',
+        value: function _render() {
+            var _this = this;
+
+            var container = this._elem.querySelector('.vertical-center-row');
+
+            var usersList = this.usersList = new _list2.default({ users: this.users });
+            container.appendChild(usersList.getElem());
+
+            var userForm = this.usersForm = new _form2.default({ users: this.users });
+            container.appendChild(userForm.getElem());
+
+            usersList.getElem().addEventListener('user-select', function (event) {
+                var selectedUser = event.detail.value;
+                userForm.openUser(selectedUser);
+            });
+
+            usersList.getElem().addEventListener('user-add', this.onUsersListAdd.bind(this));
+
+            userForm.getElem().addEventListener('delete-user', function (event) {
+                usersList.updateList(event.detail.value, 'delete');
+            });
+
+            userForm.getElem().addEventListener('save-user', function (event) {
+                var user = event.detail.value;
+                if (!_this.users.includes(user)) {
+                    _this.users.push(user);
+                    usersList.updateList(user, 'add');
+                } else {
+                    usersList.updateList(user, 'update');
+                }
+            });
+        }
+    }]);
+
+    return App;
+}();
+
+exports.default = App;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _template = __webpack_require__(7);
 
 var _template2 = _interopRequireDefault(_template);
 
-__webpack_require__(3);
+__webpack_require__(5);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -352,6 +450,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var UserForm = function () {
     function UserForm(_ref) {
+        var _this = this;
+
         var users = _ref.users;
 
         _classCallCheck(this, UserForm);
@@ -361,21 +461,26 @@ var UserForm = function () {
 
         this._render();
 
-        this.deleteButton = this._elem.querySelector('.userform__delete-button');
-        this.saveButton = this._elem.querySelector('.userform__save-button');
-
-        this.deleteButton.onclick = this.onClickDeleteButton.bind(this);
-        this.saveButton.onclick = this.onClickSaveButton.bind(this);
+        this._elem.addEventListener('click', function (e) {
+            if (e.target.classList.contains('userform__delete-button')) {
+                _this.onClickDeleteButton(e);
+                e.preventDefault();
+            } else if (e.target.classList.contains('userform__save-button')) {
+                _this.onClickSaveButton(e);
+                e.preventDefault();
+            }
+        });
     }
 
     _createClass(UserForm, [{
         key: '_render',
         value: function _render() {
-            var tmp = document.createElement('div');
-            tmp.innerHTML = (0, _template2.default)({
+            if (!this._elem) {
+                this._elem = document.createElement('div');
+            }
+            this._elem.innerHTML = (0, _template2.default)({
                 item: this._currentUser
             });
-            this._elem = tmp.firstElementChild;
         }
     }, {
         key: '_deleteUser',
@@ -392,9 +497,8 @@ var UserForm = function () {
     }, {
         key: '_saveUser',
         value: function _saveUser() {
-            this._currentUser.name = this._elem.querySelector("input[name^='name']").value;
-            this._currentUser.surname = this._elem.querySelector("input[name^='surname']").value;
-            this._currentUser.age = this._elem.querySelector("input[name^='age']").value;
+            this._currentUser.fullName = this._elem.querySelector("input[name^='fullName']").value;
+            this._currentUser.email = this._elem.querySelector("input[name^='email']").value;
 
             this._elem.dispatchEvent(new CustomEvent('save-user', {
                 bubble: true,
@@ -419,16 +523,8 @@ var UserForm = function () {
         key: 'openUser',
         value: function openUser(selectedUser) {
             this._currentUser = selectedUser;
-
-            if (selectedUser) {
-                this._elem.querySelector("input[name^='name']").value = selectedUser.name;
-                this._elem.querySelector("input[name^='surname']").value = selectedUser.surname;
-                this._elem.querySelector("input[name^='age']").value = selectedUser.age;
-            } else {
-                this._elem.querySelector("input[name^='name']").value = "";
-                this._elem.querySelector("input[name^='surname']").value = "";
-                this._elem.querySelector("input[name^='age']").value = "";
-            }
+            this._render();
+            this._elem.querySelector('input').focus();
         }
     }, {
         key: 'getUsersList',
@@ -453,7 +549,7 @@ var UserForm = function () {
 exports.default = UserForm;
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -465,11 +561,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _template = __webpack_require__(6);
+var _template = __webpack_require__(8);
 
 var _template2 = _interopRequireDefault(_template);
 
-__webpack_require__(4);
+var _user = __webpack_require__(0);
+
+var _user2 = _interopRequireDefault(_user);
+
+__webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -485,14 +585,25 @@ var UsersList = function () {
 
         this._render();
 
-        this.elemCollection = this._elem.querySelectorAll('li');
-        this.elemCollection[0].classList.add('active');
+        this.elemCollection = this._elem.getElementsByTagName('li');
 
+        if (this.elemCollection[0]) {
+            this.elemCollection[0].classList.add('active');
+        }
+        this._elem.querySelector('[data-attach-add]').onclick = this.onAddClick.bind(this);
         this._elem.onclick = this.onClick.bind(this);
     }
 
     _createClass(UsersList, [{
-        key: 'onClick',
+        key: "onAddClick",
+        value: function onAddClick(event) {
+            this._elem.dispatchEvent(new CustomEvent('user-add', {
+                bubbles: true
+            }));
+            event.preventDefault();
+        }
+    }, {
+        key: "onClick",
         value: function onClick(event) {
             event.preventDefault();
             var link = event.target.closest('a');
@@ -512,7 +623,7 @@ var UsersList = function () {
                 }
 
                 this._elem.dispatchEvent(new CustomEvent('user-select', {
-                    bubble: true,
+                    bubbles: true,
                     detail: {
                         value: selectedUser
                     }
@@ -520,21 +631,24 @@ var UsersList = function () {
             }
         }
     }, {
-        key: 'updateList',
+        key: "updateList",
         value: function updateList(user, action) {
             for (var i = 0; i < this._users.length; i++) {
-                if (this._users[i].id === user.id) {
+                if (this._users[i] === user) {
                     if (action === 'delete') {
                         this.elemCollection[i].remove();
                     }
                     if (action === 'update') {
-                        this.elemCollection[i].querySelector('a').innerHTML = user.name + ' ' + user.surname;
+                        this.elemCollection[i].querySelector('a').innerHTML = user.fullName + " " + user.email;
+                    }
+                    if (action === 'add') {
+                        this._elem.querySelector('ul').insertAdjacentHTML('beforeend', (0, _user2.default)({ item: user }));
                     }
                 }
             }
         }
     }, {
-        key: '_render',
+        key: "_render",
         value: function _render() {
             var tmp = document.createElement('div');
             tmp.innerHTML = (0, _template2.default)({
@@ -543,7 +657,7 @@ var UsersList = function () {
             this._elem = tmp.firstElementChild;
         }
     }, {
-        key: 'getElem',
+        key: "getElem",
         value: function getElem() {
             return this._elem;
         }
@@ -555,47 +669,54 @@ var UsersList = function () {
 exports.default = UsersList;
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-var pug = __webpack_require__(0);
-
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИнформация\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cform\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"name\""+pug.attr("value", item.name, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EФамилия\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"surname\""+pug.attr("value", item.surname, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EВозраст\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"age\""+pug.attr("value", item.age, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
-module.exports = template;
+// removed by extract-text-webpack-plugin
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pug = __webpack_require__(0);
+var pug = __webpack_require__(1);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cinput type=\"button\" value=\"[+]\" data-attach-add\u003E\u003Cul class=\"nav nav-pills nav-stacked\"\u003E";
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИнформация\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
+if (item) {
+pug_html = pug_html + "\u003Cform\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"fullName\""+pug.attr("value", item.fullName, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EEmail\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"email\" name=\"email\""+pug.attr("value", item.email, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\" type=\"button\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\" type=\"submit\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E";
+}
+else {
+pug_html = pug_html + "Выберите или создайте пользователя.";
+}
+pug_html = pug_html + "\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
+module.exports = template;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var pug = __webpack_require__(1);
+
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи" + (pug.escape(null == (pug_interp = ' ') ? "" : pug_interp)) + "\u003Cbutton class=\"btn-default btn\" type=\"button\" data-attach-add\u003E+\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cul class=\"nav nav-pills nav-stacked\"\u003E";
 // iterate items
 ;(function(){
   var $$obj = items;
   if ('number' == typeof $$obj.length) {
       for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
         var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca href=\"#\"\u003E" + (pug.escape(null == (pug_interp = `${item.name} ${item.surname}`) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+pug_html = pug_html + (null == (pug_interp = __webpack_require__(0).call(this, locals)) ? "" : pug_interp);
       }
   } else {
     var $$l = 0;
     for (var pug_index0 in $$obj) {
       $$l++;
       var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca href=\"#\"\u003E" + (pug.escape(null == (pug_interp = `${item.name} ${item.surname}`) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+pug_html = pug_html + (null == (pug_interp = __webpack_require__(0).call(this, locals)) ? "" : pug_interp);
     }
   }
 }).call(this);
@@ -604,90 +725,28 @@ pug_html = pug_html + "\u003C\u002Ful\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\
 module.exports = template;
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _app = __webpack_require__(2);
 
-var _list = __webpack_require__(2);
-
-var _list2 = _interopRequireDefault(_list);
-
-var _form = __webpack_require__(1);
-
-var _form2 = _interopRequireDefault(_form);
+var _app2 = _interopRequireDefault(_app);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var App = function () {
-    function App(_ref) {
-        var elem = _ref.elem;
-
-        _classCallCheck(this, App);
-
-        this._elem = elem;
-
-        var users = [{
-            "id": "1",
-            "name": "Иван",
-            "surname": "Иванов",
-            "age": "28 лет"
-        }, {
-            "id": "2",
-            "name": "Александр",
-            "surname": "Тарасов",
-            "age": "20 лет"
-        }, {
-            "id": "3",
-            "name": "Петр",
-            "surname": "Сидоров",
-            "age": "33 года"
-        }];
-
-        this._render();
-    }
-
-    _createClass(App, [{
-        key: '_render',
-        value: function _render() {
-
-            var container = this._elem.querySelector('.vertical-center-row');
-
-            var usersList = new _list2.default({ users: users });
-            container.appendChild(usersList.getElem());
-
-            var userForm = new _form2.default({ users: users });
-            container.appendChild(userForm.getElem());
-
-            usersList.getElem().addEventListener('user-select', function (event) {
-                var selectedUser = event.detail.value;
-                userForm.openUser(selectedUser);
-            });
-
-            userForm.getElem().addEventListener('delete-user', function (event) {
-                usersList.updateList(event.detail.value, 'delete');
-            });
-
-            userForm.getElem().addEventListener('save-user', function (event) {
-                usersList.updateList(event.detail.value, 'update');
-            });
-        }
-    }]);
-
-    return App;
-}();
+new _app2.default({
+    elem: document.body
+});
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=app.js.map
+//# sourceMappingURL=main.js.map
