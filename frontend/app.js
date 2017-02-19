@@ -74,7 +74,7 @@ export default class App {
         
         xhr.onload = e => {
             this.usersList.updateList(user, 'add');
-            // console.log("Пользователь добавлен");
+            console.log("Пользователь добавлен");
         }
 
         xhr.onerror = function() {
@@ -110,6 +110,7 @@ export default class App {
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         
         xhr.onload = e => {
+
             this.usersList.updateList(user, 'delete');
             console.log("Пользователь удален");
         }

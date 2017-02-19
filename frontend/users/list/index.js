@@ -57,20 +57,24 @@ export default class UsersList {
         if (action === 'add') {
             this._users.push(user);
             this._elem.querySelector('ul').innerHTML = userTemplate({items: this._users});
+            this.elemCollection[this.elemCollection.length - 1].classList.add('active');
             return;
         }
+
         for (var i = 0; i < this._users.length; i++) {
             if (this._users[i] === user) {
                 if (action === 'delete') {
+                    this._users.splice(i, 1);
+                    let elem =  this.elemCollection[i + 1] || this.elemCollection[i - 1] || null;
                     this.elemCollection[i].remove();
-                    let elem = this.elemCollection[i - 1] || this.elemCollection[i] || null;
                     if (elem) {
                         elem.classList.add('active');
                     }
                 }
                 if (action === 'update') {
-                    this.elemCollection[i].querySelector('a').innerHTML = `${user.fullName} ${user.email}`;
+                    this.elemCollection[i].querySelector('a').innerHTML = user.fullName;
                 }
+                break;
             }
         }
     }

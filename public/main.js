@@ -463,7 +463,7 @@ var App = function () {
 
             xhr.onload = function (e) {
                 _this3.usersList.updateList(user, 'add');
-                // console.log("Пользователь добавлен");
+                console.log("Пользователь добавлен");
             };
 
             xhr.onerror = function () {
@@ -503,6 +503,7 @@ var App = function () {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
+
                 _this4.usersList.updateList(user, 'delete');
                 console.log("Пользователь удален");
             };
@@ -778,20 +779,24 @@ var UsersList = function () {
             if (action === 'add') {
                 this._users.push(user);
                 this._elem.querySelector('ul').innerHTML = (0, _user2.default)({ items: this._users });
+                this.elemCollection[this.elemCollection.length - 1].classList.add('active');
                 return;
             }
+
             for (var i = 0; i < this._users.length; i++) {
                 if (this._users[i] === user) {
                     if (action === 'delete') {
+                        this._users.splice(i, 1);
+                        var elem = this.elemCollection[i + 1] || this.elemCollection[i - 1] || null;
                         this.elemCollection[i].remove();
-                        var elem = this.elemCollection[i - 1] || this.elemCollection[i] || null;
                         if (elem) {
                             elem.classList.add('active');
                         }
                     }
                     if (action === 'update') {
-                        this.elemCollection[i].querySelector('a').innerHTML = user.fullName + " " + user.email;
+                        this.elemCollection[i].querySelector('a').innerHTML = user.fullName;
                     }
+                    break;
                 }
             }
         }
