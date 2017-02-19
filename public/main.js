@@ -70,32 +70,6 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pug = __webpack_require__(1);
-
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {// iterate items
-;(function(){
-  var $$obj = items;
-  if ('number' == typeof $$obj.length) {
-      for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
-        var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
-      }
-  } else {
-    var $$l = 0;
-    for (var pug_index0 in $$obj) {
-      $$l++;
-      var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
-    }
-  }
-}).call(this);
-}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
-module.exports = template;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -354,6 +328,32 @@ function pug_rethrow(err, filename, lineno, str){
 
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var pug = __webpack_require__(0);
+
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {// iterate items
+;(function(){
+  var $$obj = items;
+  if ('number' == typeof $$obj.length) {
+      for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
+        var item = $$obj[pug_index0];
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+      }
+  } else {
+    var $$l = 0;
+    for (var pug_index0 in $$obj) {
+      $$l++;
+      var item = $$obj[pug_index0];
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+    }
+  }
+}).call(this);
+}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
+module.exports = template;
+
+/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -392,17 +392,45 @@ var App = function () {
     _createClass(App, [{
         key: 'onUsersListAdd',
         value: function onUsersListAdd() {
-            var user = {
-                fullName: '',
-                email: ''
+            var _this = this;
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("GET", 'https://randomuser.me/api/?results=1&nat=gb', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+            xhr.onload = function (e) {
+                var generatedUser = JSON.parse(xhr.responseText);
+
+                var fisrtsName = generatedUser.results[0].name.first;
+                fisrtsName = name[0].toUpperCase() + name.slice(1);
+
+                var lastName = generatedUser.results[0].name.last;
+                lastName = lastName[0].toUpperCase() + lastName.slice(1);
+
+                var user = {
+                    fullName: fisrtsName + ' ' + lastName,
+                    email: generatedUser.results[0].email
+                };
+
+                _this.usersForm.openUser(user);
             };
 
-            this.usersForm.openUser(user);
+            xhr.onerror = function () {
+                var user = {
+                    fullName: '',
+                    email: ''
+                };
+
+                this.usersForm.openUser(user);
+            };
+
+            xhr.send();
         }
     }, {
         key: '_loadUsers',
         value: function _loadUsers() {
-            var _this = this;
+            var _this2 = this;
 
             var xhr = new XMLHttpRequest();
 
@@ -410,8 +438,8 @@ var App = function () {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
-                _this.users = JSON.parse(xhr.responseText);
-                _this._render();
+                _this2.users = JSON.parse(xhr.responseText);
+                _this2._render();
             };
 
             xhr.onerror = function () {
@@ -424,7 +452,7 @@ var App = function () {
     }, {
         key: '_addUser',
         value: function _addUser(user) {
-            var _this2 = this;
+            var _this3 = this;
 
             var xhr = new XMLHttpRequest();
             var json = JSON.stringify(user);
@@ -433,7 +461,7 @@ var App = function () {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
-                _this2.usersList.updateList(user, 'add');
+                _this3.usersList.updateList(user, 'add');
                 // console.log("Пользователь добавлен");
             };
 
@@ -465,7 +493,7 @@ var App = function () {
     }, {
         key: '_deleteUser',
         value: function _deleteUser(user) {
-            var _this3 = this;
+            var _this4 = this;
 
             var xhr = new XMLHttpRequest();
             var json = JSON.stringify(user);
@@ -474,7 +502,7 @@ var App = function () {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
-                _this3.usersList.updateList(user, 'delete');
+                _this4.usersList.updateList(user, 'delete');
                 console.log("Пользователь удален");
             };
 
@@ -487,7 +515,7 @@ var App = function () {
     }, {
         key: '_render',
         value: function _render() {
-            var _this4 = this;
+            var _this5 = this;
 
             var container = this._elem.querySelector('.vertical-center-row');
 
@@ -506,16 +534,16 @@ var App = function () {
 
             userForm.getElem().addEventListener('delete-user', function (event) {
                 var user = event.detail.value;
-                _this4._deleteUser(user);
+                _this5._deleteUser(user);
             });
 
             userForm.getElem().addEventListener('save-user', function (event) {
                 var user = event.detail.value;
 
-                if (!_this4.users.includes(user)) {
-                    _this4._addUser(user);
+                if (!_this5.users.includes(user)) {
+                    _this5._addUser(user);
                 } else {
-                    _this4._updateUser(user);
+                    _this5._updateUser(user);
                 }
             });
         }
@@ -677,7 +705,7 @@ var _template = __webpack_require__(8);
 
 var _template2 = _interopRequireDefault(_template);
 
-var _user = __webpack_require__(0);
+var _user = __webpack_require__(1);
 
 var _user2 = _interopRequireDefault(_user);
 
@@ -803,7 +831,7 @@ exports.default = UsersList;
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pug = __webpack_require__(1);
+var pug = __webpack_require__(0);
 
 function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИнформация\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
 if (item) {
@@ -819,11 +847,11 @@ module.exports = template;
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pug = __webpack_require__(1);
+var pug = __webpack_require__(0);
 
 function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи" + (pug.escape(null == (pug_interp = ' ') ? "" : pug_interp)) + "\u003Cbutton class=\"btn-default btn btn-xs pull-right\" type=\"button\" data-attach-add\u003E\u003Cspan class=\"glyphicon glyphicon-plus\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
-if (items) {
-pug_html = pug_html + "\u003Cul class=\"nav nav-pills nav-stacked\"\u003E" + (null == (pug_interp = __webpack_require__(0).call(this, locals)) ? "" : pug_interp) + "\u003C\u002Ful\u003E";
+if (items.length !== 0) {
+pug_html = pug_html + "\u003Cul class=\"nav nav-pills nav-stacked\"\u003E" + (null == (pug_interp = __webpack_require__(1).call(this, locals)) ? "" : pug_interp) + "\u003C\u002Ful\u003E";
 }
 else {
 pug_html = pug_html + "Пользователи отсутствуют";

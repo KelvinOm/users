@@ -6,7 +6,7 @@
             button(type="button" class="btn-default btn btn-xs pull-right" data-attach-add)
                 span(class="glyphicon glyphicon-plus")
         .panel-body
-            if items
+            if items.length !== 0
                 ul(class='nav nav-pills nav-stacked')
                     include ./user
             else 

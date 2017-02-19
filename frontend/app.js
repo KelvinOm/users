@@ -11,12 +11,38 @@ export default class App {
     }
 
     onUsersListAdd() {
-        let user = {
-            fullName: '',
-            email: ''
+        let xhr = new XMLHttpRequest();
+        
+        xhr.open("GET", 'https://randomuser.me/api/?results=1&nat=gb', true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        
+        xhr.onload = e => {
+            let generatedUser = JSON.parse(xhr.responseText);
+
+            let fisrtsName = generatedUser.results[0].name.first;
+                fisrtsName = name[0].toUpperCase() + name.slice(1);
+
+            let lastName = generatedUser.results[0].name.last;
+                lastName = lastName[0].toUpperCase() + lastName.slice(1);
+
+            let user = {
+                fullName: `${fisrtsName} ${lastName}`,
+                email: generatedUser.results[0].email
+            }
+
+            this.usersForm.openUser(user);
         };
 
-        this.usersForm.openUser(user);
+        xhr.onerror = function() {
+            let user = {
+                fullName: '',
+                email: ''
+            };
+
+            this.usersForm.openUser(user);
+        };
+
+        xhr.send();
     }
 
     _loadUsers() {
