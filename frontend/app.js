@@ -7,9 +7,7 @@ export default class App {
     constructor({elem}) {
         this._elem = elem;
 
-        this.users = [];
-
-        this._render();
+        this._loadUsers();
     }
 
     onUsersListAdd() {
@@ -21,14 +19,31 @@ export default class App {
         this.usersForm.openUser(user);
     }
 
+    _loadUsers() {
+        let xhr = new XMLHttpRequest();
+        
+        xhr.open("GET", 'http://test-api.javascript.ru/v1/melnikov/users', true)
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        
+        xhr.onload = e => {
+            this.users = JSON.parse(xhr.responseText);
+            this._render();
+        };
+
+        xhr.onerror = function() {
+            this.users = [];
+            this._render();
+        };
+
+        xhr.send();
+    }
+
     _render() {
 
         let container = this._elem.querySelector('.vertical-center-row');
 
         let usersList = this.usersList = new UsersList({ users: this.users });
         container.appendChild(usersList.getElem());
-
-
 
         let userForm = this.usersForm = new UserForm({ users: this.users });
         container.appendChild(userForm.getElem());

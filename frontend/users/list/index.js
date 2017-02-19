@@ -25,7 +25,6 @@ export default class UsersList {
         event.preventDefault();
     }
 
-
     onClick(event) {
         event.preventDefault();
         let link = event.target.closest('a');
@@ -38,7 +37,8 @@ export default class UsersList {
             }
 
             for (let i = 0; i <= this.elemCollection.length - 1; i++) {
-                if (this.elemCollection[i].querySelector('a').innerHTML == link.innerHTML) {
+                let colectionId = this.elemCollection[i].querySelector('a').getAttribute('data-id'); 
+                if (colectionId == link.getAttribute('data-id')) {
                     selectedUser = this._users[i];
                     this.elemCollection[i].classList.add('active');
                 }

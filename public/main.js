@@ -369,9 +369,7 @@ var App = function () {
 
         this._elem = elem;
 
-        this.users = [];
-
-        this._render();
+        this._loadUsers();
     }
 
     _createClass(App, [{
@@ -385,9 +383,31 @@ var App = function () {
             this.usersForm.openUser(user);
         }
     }, {
+        key: '_loadUsers',
+        value: function _loadUsers() {
+            var _this = this;
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("GET", 'http://test-api.javascript.ru/v1/melnikov/users', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+            xhr.onload = function (e) {
+                _this.users = JSON.parse(xhr.responseText);
+                _this._render();
+            };
+
+            xhr.onerror = function () {
+                this.users = [];
+                this._render();
+            };
+
+            xhr.send();
+        }
+    }, {
         key: '_render',
         value: function _render() {
-            var _this = this;
+            var _this2 = this;
 
             var container = this._elem.querySelector('.vertical-center-row');
 
@@ -410,8 +430,8 @@ var App = function () {
 
             userForm.getElem().addEventListener('save-user', function (event) {
                 var user = event.detail.value;
-                if (!_this.users.includes(user)) {
-                    _this.users.push(user);
+                if (!_this2.users.includes(user)) {
+                    _this2.users.push(user);
                     usersList.updateList(user, 'add');
                 } else {
                     usersList.updateList(user, 'update');
@@ -616,7 +636,8 @@ var UsersList = function () {
                 }
 
                 for (var _i = 0; _i <= this.elemCollection.length - 1; _i++) {
-                    if (this.elemCollection[_i].querySelector('a').innerHTML == link.innerHTML) {
+                    var colectionId = this.elemCollection[_i].querySelector('a').getAttribute('data-id');
+                    if (colectionId == link.getAttribute('data-id')) {
                         selectedUser = this._users[_i];
                         this.elemCollection[_i].classList.add('active');
                     }
@@ -709,14 +730,14 @@ function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var l
   if ('number' == typeof $$obj.length) {
       for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
         var item = $$obj[pug_index0];
-pug_html = pug_html + (null == (pug_interp = __webpack_require__(0).call(this, locals)) ? "" : pug_interp);
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
       }
   } else {
     var $$l = 0;
     for (var pug_index0 in $$obj) {
       $$l++;
       var item = $$obj[pug_index0];
-pug_html = pug_html + (null == (pug_interp = __webpack_require__(0).call(this, locals)) ? "" : pug_interp);
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
     }
   }
 }).call(this);

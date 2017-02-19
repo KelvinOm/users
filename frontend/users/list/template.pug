@@ -5,8 +5,8 @@
             = ' '
             button(type="button" class="btn-default btn" data-attach-add) +
         .panel-body
-
             ul(class='nav nav-pills nav-stacked')
                 each item in items
-                    include ./user
+                    li
+                        a(href="#" data-id=item._id) #{item.fullName} #{item.email}
 
