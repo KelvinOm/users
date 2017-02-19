@@ -54,16 +54,22 @@ export default class UsersList {
     }
 
     updateList(user, action) {
+        if (action === 'add') {
+            this._users.push(user);
+            this._elem.querySelector('ul').insertAdjacentHTML('beforeend', userTemplate({items: this._users}));
+            return;
+        }
         for (var i = 0; i < this._users.length; i++) {
             if (this._users[i] === user) {
                 if (action === 'delete') {
                     this.elemCollection[i].remove();
+                    let elem = this.elemCollection[i - 1] || this.elemCollection[i] || null;
+                    if (elem) {
+                        elem.classList.add('active');
+                    }
                 }
                 if (action === 'update') {
                     this.elemCollection[i].querySelector('a').innerHTML = `${user.fullName} ${user.email}`;
-                }
-                if (action === 'add') {
-                    this._elem.querySelector('ul').insertAdjacentHTML('beforeend', userTemplate({item: user}));
                 }
             }
         }

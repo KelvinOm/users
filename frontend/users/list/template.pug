@@ -3,10 +3,12 @@
         .panel-heading
             | Пользователи
             = ' '
-            button(type="button" class="btn-default btn" data-attach-add) +
+            button(type="button" class="btn-default btn btn-xs pull-right" data-attach-add)
+                span(class="glyphicon glyphicon-plus")
         .panel-body
-            ul(class='nav nav-pills nav-stacked')
-                each item in items
-                    li
-                        a(href="#" data-id=item._id) #{item.fullName} #{item.email}
+            if items
+                ul(class='nav nav-pills nav-stacked')
+                    include ./user
+            else 
+                | Пользователи отсутствуют
 

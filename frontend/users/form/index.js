@@ -7,7 +7,6 @@ export default class UserForm {
         this._users = users;
         this._currentUser = users[0];
 
-
         this._render();
 
         this._elem.addEventListener('click', e => {
@@ -38,7 +37,16 @@ export default class UserForm {
             }
         }));
 
-        this.openUser(null);
+        let selectedUser;
+
+        for (var i = 0; i < this._users.length; i++) {
+            if (this._currentUser._id === this._users[i]._id) {
+                selectedUser = this._users[i - 1] || this._users[i + 1] || null;
+                break;
+            }
+        }
+
+        this.openUser(selectedUser);
     }
 
     _saveUser() {
@@ -66,7 +74,9 @@ export default class UserForm {
     openUser(selectedUser) {
         this._currentUser = selectedUser;
         this._render();
-        this._elem.querySelector('input').focus();
+        if (this._currentUser) {
+            this._elem.querySelector('input').focus();
+        }
     }
 
     getUsersList() {

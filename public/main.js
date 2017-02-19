@@ -72,7 +72,24 @@
 
 var pug = __webpack_require__(1);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cli\u003E\u003Ca href=\"#\"\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {// iterate items
+;(function(){
+  var $$obj = items;
+  if ('number' == typeof $$obj.length) {
+      for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
+        var item = $$obj[pug_index0];
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+      }
+  } else {
+    var $$l = 0;
+    for (var pug_index0 in $$obj) {
+      $$l++;
+      var item = $$obj[pug_index0];
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+    }
+  }
+}).call(this);
+}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -405,9 +422,72 @@ var App = function () {
             xhr.send();
         }
     }, {
+        key: '_addUser',
+        value: function _addUser(user) {
+            var _this2 = this;
+
+            var xhr = new XMLHttpRequest();
+            var json = JSON.stringify(user);
+
+            xhr.open("POST", 'http://test-api.javascript.ru/v1/melnikov/users/', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+            xhr.onload = function (e) {
+                _this2.usersList.updateList(user, 'add');
+                // console.log("Пользователь добавлен");
+            };
+
+            xhr.onerror = function () {
+                console.log("Ошибка!");
+            };
+
+            xhr.send(json);
+        }
+    }, {
+        key: '_updateUser',
+        value: function _updateUser(user) {
+            var xhr = new XMLHttpRequest();
+            var json = JSON.stringify(user);
+
+            xhr.open("PATCH", 'http://test-api.javascript.ru/v1/melnikov/users/' + user._id, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+            xhr.onload = function (e) {
+                console.log("Пользователь обновлен");
+            };
+
+            xhr.onerror = function () {
+                console.log("Ошибка!");
+            };
+
+            xhr.send(json);
+        }
+    }, {
+        key: '_deleteUser',
+        value: function _deleteUser(user) {
+            var _this3 = this;
+
+            var xhr = new XMLHttpRequest();
+            var json = JSON.stringify(user);
+
+            xhr.open("DELETE", 'http://test-api.javascript.ru/v1/melnikov/users/' + user._id, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+            xhr.onload = function (e) {
+                _this3.usersList.updateList(user, 'delete');
+                console.log("Пользователь удален");
+            };
+
+            xhr.onerror = function () {
+                console.log("Ошибка!");
+            };
+
+            xhr.send(json);
+        }
+    }, {
         key: '_render',
         value: function _render() {
-            var _this2 = this;
+            var _this4 = this;
 
             var container = this._elem.querySelector('.vertical-center-row');
 
@@ -425,16 +505,17 @@ var App = function () {
             usersList.getElem().addEventListener('user-add', this.onUsersListAdd.bind(this));
 
             userForm.getElem().addEventListener('delete-user', function (event) {
-                usersList.updateList(event.detail.value, 'delete');
+                var user = event.detail.value;
+                _this4._deleteUser(user);
             });
 
             userForm.getElem().addEventListener('save-user', function (event) {
                 var user = event.detail.value;
-                if (!_this2.users.includes(user)) {
-                    _this2.users.push(user);
-                    usersList.updateList(user, 'add');
+
+                if (!_this4.users.includes(user)) {
+                    _this4._addUser(user);
                 } else {
-                    usersList.updateList(user, 'update');
+                    _this4._updateUser(user);
                 }
             });
         }
@@ -512,7 +593,16 @@ var UserForm = function () {
                 }
             }));
 
-            this.openUser(null);
+            var selectedUser = void 0;
+
+            for (var i = 0; i < this._users.length; i++) {
+                if (this._currentUser._id === this._users[i]._id) {
+                    selectedUser = this._users[i - 1] || this._users[i + 1] || null;
+                    break;
+                }
+            }
+
+            this.openUser(selectedUser);
         }
     }, {
         key: '_saveUser',
@@ -544,7 +634,9 @@ var UserForm = function () {
         value: function openUser(selectedUser) {
             this._currentUser = selectedUser;
             this._render();
-            this._elem.querySelector('input').focus();
+            if (this._currentUser) {
+                this._elem.querySelector('input').focus();
+            }
         }
     }, {
         key: 'getUsersList',
@@ -654,16 +746,22 @@ var UsersList = function () {
     }, {
         key: "updateList",
         value: function updateList(user, action) {
+            if (action === 'add') {
+                this._users.push(user);
+                this._elem.querySelector('ul').insertAdjacentHTML('beforeend', (0, _user2.default)({ items: this._users }));
+                return;
+            }
             for (var i = 0; i < this._users.length; i++) {
                 if (this._users[i] === user) {
                     if (action === 'delete') {
                         this.elemCollection[i].remove();
+                        var elem = this.elemCollection[i - 1] || this.elemCollection[i] || null;
+                        if (elem) {
+                            elem.classList.add('active');
+                        }
                     }
                     if (action === 'update') {
                         this.elemCollection[i].querySelector('a').innerHTML = user.fullName + " " + user.email;
-                    }
-                    if (action === 'add') {
-                        this._elem.querySelector('ul').insertAdjacentHTML('beforeend', (0, _user2.default)({ item: user }));
                     }
                 }
             }
@@ -712,7 +810,7 @@ if (item) {
 pug_html = pug_html + "\u003Cform\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"fullName\""+pug.attr("value", item.fullName, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EEmail\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"email\" name=\"email\""+pug.attr("value", item.email, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\" type=\"button\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\" type=\"submit\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E";
 }
 else {
-pug_html = pug_html + "Выберите или создайте пользователя.";
+pug_html = pug_html + "Выберите или создайте пользователя";
 }
 pug_html = pug_html + "\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
 module.exports = template;
@@ -723,26 +821,14 @@ module.exports = template;
 
 var pug = __webpack_require__(1);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи" + (pug.escape(null == (pug_interp = ' ') ? "" : pug_interp)) + "\u003Cbutton class=\"btn-default btn\" type=\"button\" data-attach-add\u003E+\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cul class=\"nav nav-pills nav-stacked\"\u003E";
-// iterate items
-;(function(){
-  var $$obj = items;
-  if ('number' == typeof $$obj.length) {
-      for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
-        var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
-      }
-  } else {
-    var $$l = 0;
-    for (var pug_index0 in $$obj) {
-      $$l++;
-      var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
-    }
-  }
-}).call(this);
-
-pug_html = pug_html + "\u003C\u002Ful\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи" + (pug.escape(null == (pug_interp = ' ') ? "" : pug_interp)) + "\u003Cbutton class=\"btn-default btn btn-xs pull-right\" type=\"button\" data-attach-add\u003E\u003Cspan class=\"glyphicon glyphicon-plus\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
+if (items) {
+pug_html = pug_html + "\u003Cul class=\"nav nav-pills nav-stacked\"\u003E" + (null == (pug_interp = __webpack_require__(0).call(this, locals)) ? "" : pug_interp) + "\u003C\u002Ful\u003E";
+}
+else {
+pug_html = pug_html + "Пользователи отсутствуют";
+}
+pug_html = pug_html + "\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
 module.exports = template;
 
 /***/ }),
