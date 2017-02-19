@@ -56,7 +56,7 @@ export default class UsersList {
     updateList(user, action) {
         if (action === 'add') {
             this._users.push(user);
-            this._elem.querySelector('ul').insertAdjacentHTML('beforeend', userTemplate({items: this._users}));
+            this._elem.querySelector('ul').innerHTML = userTemplate({items: this._users});
             return;
         }
         for (var i = 0; i < this._users.length; i++) {

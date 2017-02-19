@@ -748,7 +748,7 @@ var UsersList = function () {
         value: function updateList(user, action) {
             if (action === 'add') {
                 this._users.push(user);
-                this._elem.querySelector('ul').insertAdjacentHTML('beforeend', (0, _user2.default)({ items: this._users }));
+                this._elem.querySelector('ul').innerHTML = (0, _user2.default)({ items: this._users });
                 return;
             }
             for (var i = 0; i < this._users.length; i++) {
