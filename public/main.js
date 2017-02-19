@@ -339,14 +339,14 @@ function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var l
   if ('number' == typeof $$obj.length) {
       for (var pug_index0 = 0, $$l = $$obj.length; pug_index0 < $$l; pug_index0++) {
         var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
       }
   } else {
     var $$l = 0;
     for (var pug_index0 in $$obj) {
       $$l++;
       var item = $$obj[pug_index0];
-pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + " " + (pug.escape(null == (pug_interp = item.email) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
+pug_html = pug_html + "\u003Cli\u003E\u003Ca" + (" href=\"#\""+pug.attr("data-id", item._id, true, true)) + "\u003E" + (pug.escape(null == (pug_interp = item.fullName) ? "" : pug_interp)) + "\u003C\u002Fa\u003E\u003C\u002Fli\u003E";
     }
   }
 }).call(this);
@@ -395,6 +395,7 @@ var App = function () {
             var _this = this;
 
             var xhr = new XMLHttpRequest();
+            var user = void 0;
 
             xhr.open("GET", 'https://randomuser.me/api/?results=1&nat=gb', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -402,14 +403,14 @@ var App = function () {
             xhr.onload = function (e) {
                 var generatedUser = JSON.parse(xhr.responseText);
 
-                var fisrtsName = generatedUser.results[0].name.first;
-                fisrtsName = name[0].toUpperCase() + name.slice(1);
+                var firstName = generatedUser.results[0].name.first;
+                firstName = firstName[0].toUpperCase() + firstName.slice(1);
 
                 var lastName = generatedUser.results[0].name.last;
                 lastName = lastName[0].toUpperCase() + lastName.slice(1);
 
-                var user = {
-                    fullName: fisrtsName + ' ' + lastName,
+                user = {
+                    fullName: firstName + ' ' + lastName,
                     email: generatedUser.results[0].email
                 };
 
@@ -417,7 +418,7 @@ var App = function () {
             };
 
             xhr.onerror = function () {
-                var user = {
+                user = {
                     fullName: '',
                     email: ''
                 };

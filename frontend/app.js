@@ -12,6 +12,7 @@ export default class App {
 
     onUsersListAdd() {
         let xhr = new XMLHttpRequest();
+        let user;
         
         xhr.open("GET", 'https://randomuser.me/api/?results=1&nat=gb', true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -19,14 +20,14 @@ export default class App {
         xhr.onload = e => {
             let generatedUser = JSON.parse(xhr.responseText);
 
-            let fisrtsName = generatedUser.results[0].name.first;
-                fisrtsName = name[0].toUpperCase() + name.slice(1);
+            let firstName = generatedUser.results[0].name.first;
+                firstName = firstName[0].toUpperCase() + firstName.slice(1);
 
             let lastName = generatedUser.results[0].name.last;
                 lastName = lastName[0].toUpperCase() + lastName.slice(1);
 
-            let user = {
-                fullName: `${fisrtsName} ${lastName}`,
+            user = {
+                fullName: `${firstName} ${lastName}`,
                 email: generatedUser.results[0].email
             }
 
@@ -34,7 +35,7 @@ export default class App {
         };
 
         xhr.onerror = function() {
-            let user = {
+            user = {
                 fullName: '',
                 email: ''
             };
