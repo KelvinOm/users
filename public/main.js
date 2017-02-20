@@ -787,6 +787,7 @@ var UsersList = function () {
         if (this.elemCollection[0]) {
             this.elemCollection[0].classList.add('active');
         }
+
         this._elem.querySelector('[data-attach-add]').onclick = this.onAddClick.bind(this);
         this._elem.onclick = this.onClick.bind(this);
     }
@@ -850,6 +851,8 @@ var UsersList = function () {
                         this.elemCollection[i].remove();
                         if (elem) {
                             elem.classList.add('active');
+                        } else {
+                            this._elem.querySelector('ul').innerHTML = '<li>Список пуст</li>';
                         }
                     }
                     if (action === 'update') {
