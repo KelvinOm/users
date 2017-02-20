@@ -1,14 +1,14 @@
 .user-list.col-lg-3
     .panel.panel-default
         .panel-heading
-            | Пользователи
+            | Личности
             = ' '
             button(type="button" class="btn-default btn btn-xs pull-right" data-attach-add)
                 span(class="glyphicon glyphicon-plus")
         .panel-body
-            if items.length !== 0
-                ul(class='nav nav-pills nav-stacked')
+            ul(class='nav nav-pills nav-stacked')
+                if items.length === 0
+                    li Личности отсутствуют
+                else 
                     include ./user
-            else 
-                | Пользователи отсутствуют
 

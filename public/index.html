@@ -14,17 +14,9 @@
             background-image: url(bg.jpg);
         }
 
-        html, body, .container-table {
-            height: 100%;
-        }
-
-        .container-table {
-            display: table;
-        }
-
-        .vertical-center-row {
-            display: table-cell;
-            vertical-align: middle;
+        .title {
+            text-align: center;
+            margin: 100px 0 30px;
         }
 
         .panel {
@@ -36,14 +28,20 @@
 </head>
 
 <body>
+
     <div class="container container-table">
-        <div class="row vertical-center-row" data-container>
+        <div class="row" data-container>
+            <div class="title">
+                <img src="random.png" alt="" height="100px;">
+                <h1><span class="label label-warning" style="box-shadow: 0 1px 1px rgba(0,0,0,.05);">Генератор случайных личностей</span></h1>
+            </div><br><br>
         </div>
     </div>
 
     <script src="main.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>

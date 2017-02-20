@@ -16,6 +16,9 @@ export default class UserForm {
             } else if(e.target.classList.contains('userform__save-button')) {
                 this.onClickSaveButton(e);
                 e.preventDefault();
+            } else if(e.target.classList.contains('userform__add-button')) {
+                this.onClickaddButton(e);
+                e.preventDefault();
             }
         });
     }
@@ -69,6 +72,13 @@ export default class UserForm {
     onClickSaveButton(event) {
         event.preventDefault();
         this._saveUser();
+    }
+
+    onClickaddButton(event) {
+        event.preventDefault();
+        this._elem.dispatchEvent(new CustomEvent('user-add', {
+            bubble: true
+        }));
     }
 
     openUser(selectedUser) {

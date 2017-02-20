@@ -19,10 +19,15 @@ export default class UsersList {
     }
 
     onAddClick(event) {
+        event.preventDefault();
+
+        for (var i = 0; i < this.elemCollection.length; i++) {
+            this.elemCollection[i].classList.remove('active');
+        }
+
         this._elem.dispatchEvent(new CustomEvent('user-add', {
             bubbles: true
         }));
-        event.preventDefault();
     }
 
     onClick(event) {
@@ -60,9 +65,8 @@ export default class UsersList {
             this.elemCollection[this.elemCollection.length - 1].classList.add('active');
             return;
         }
-
         for (var i = 0; i < this._users.length; i++) {
-            if (this._users[i] === user) {
+            if (this._users[i]._id === user._id) {
                 if (action === 'delete') {
                     this._users.splice(i, 1);
                     let elem =  this.elemCollection[i + 1] || this.elemCollection[i - 1] || null;

@@ -409,12 +409,22 @@ var App = function () {
                 var lastName = generatedUser.results[0].name.last;
                 lastName = lastName[0].toUpperCase() + lastName.slice(1);
 
+                var avatarUrl = generatedUser.results[0].picture.large;
+
+                var city = generatedUser.results[0].location.city;
+                city = city[0].toUpperCase() + city.slice(1);
+
+                var street = generatedUser.results[0].location.street;
+
                 user = {
                     fullName: firstName + ' ' + lastName,
-                    email: generatedUser.results[0].email
+                    email: generatedUser.results[0].email,
+                    avatarUrl: avatarUrl,
+                    birthdate: _this._formatDate(generatedUser.results[0].dob),
+                    address: city + ' ' + street
                 };
 
-                _this.usersForm.openUser(user);
+                _this.userForm.openUser(user);
             };
 
             xhr.onerror = function () {
@@ -423,10 +433,29 @@ var App = function () {
                     email: ''
                 };
 
-                this.usersForm.openUser(user);
+                this.userForm.openUser(user);
             };
 
             xhr.send();
+        }
+    }, {
+        key: '_formatDate',
+        value: function _formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [day, month, year].join('.');
+        }
+    }, {
+        key: '_toDate',
+        value: function _toDate(date) {
+            var parts = date.split(".");
+            return new Date(parts[2], parts[1] - 1, parts[0]);
         }
     }, {
         key: '_loadUsers',
@@ -440,6 +469,11 @@ var App = function () {
 
             xhr.onload = function (e) {
                 _this2.users = JSON.parse(xhr.responseText);
+
+                for (var i = 0; i < _this2.users.length; i++) {
+                    _this2.users[i].birthdate = _this2._formatDate(_this2.users[i].birthdate);
+                }
+
                 _this2._render();
             };
 
@@ -456,13 +490,20 @@ var App = function () {
             var _this3 = this;
 
             var xhr = new XMLHttpRequest();
+
+            user.birthdate = this._toDate(user.birthdate);
+
             var json = JSON.stringify(user);
 
             xhr.open("POST", 'http://test-api.javascript.ru/v1/melnikov/users/', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
-                _this3.usersList.updateList(user, 'add');
+                var loadedUser = JSON.parse(xhr.responseText);
+                loadedUser.birthdate = _this3._formatDate(loadedUser.birthdate);
+
+                _this3.usersList.updateList(loadedUser, 'add');
+                _this3.userForm.openUser(loadedUser);
                 console.log("Пользователь добавлен");
             };
 
@@ -475,6 +516,8 @@ var App = function () {
     }, {
         key: '_updateUser',
         value: function _updateUser(user) {
+            var _this4 = this;
+
             var xhr = new XMLHttpRequest();
             var json = JSON.stringify(user);
 
@@ -482,6 +525,7 @@ var App = function () {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
+                _this4.usersList.updateList(user, 'update');
                 console.log("Пользователь обновлен");
             };
 
@@ -494,7 +538,7 @@ var App = function () {
     }, {
         key: '_deleteUser',
         value: function _deleteUser(user) {
-            var _this4 = this;
+            var _this5 = this;
 
             var xhr = new XMLHttpRequest();
             var json = JSON.stringify(user);
@@ -503,8 +547,7 @@ var App = function () {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
             xhr.onload = function (e) {
-
-                _this4.usersList.updateList(user, 'delete');
+                _this5.usersList.updateList(user, 'delete');
                 console.log("Пользователь удален");
             };
 
@@ -517,14 +560,14 @@ var App = function () {
     }, {
         key: '_render',
         value: function _render() {
-            var _this5 = this;
+            var _this6 = this;
 
-            var container = this._elem.querySelector('.vertical-center-row');
+            var container = this._elem.querySelector('[data-container]');
 
             var usersList = this.usersList = new _list2.default({ users: this.users });
             container.appendChild(usersList.getElem());
 
-            var userForm = this.usersForm = new _form2.default({ users: this.users });
+            var userForm = this.userForm = new _form2.default({ users: this.users });
             container.appendChild(userForm.getElem());
 
             usersList.getElem().addEventListener('user-select', function (event) {
@@ -533,19 +576,20 @@ var App = function () {
             });
 
             usersList.getElem().addEventListener('user-add', this.onUsersListAdd.bind(this));
+            userForm.getElem().addEventListener('user-add', this.onUsersListAdd.bind(this));
 
             userForm.getElem().addEventListener('delete-user', function (event) {
                 var user = event.detail.value;
-                _this5._deleteUser(user);
+                _this6._deleteUser(user);
             });
 
             userForm.getElem().addEventListener('save-user', function (event) {
                 var user = event.detail.value;
 
-                if (!_this5.users.includes(user)) {
-                    _this5._addUser(user);
+                if (!_this6.users.includes(user)) {
+                    _this6._addUser(user);
                 } else {
-                    _this5._updateUser(user);
+                    _this6._updateUser(user);
                 }
             });
         }
@@ -598,6 +642,9 @@ var UserForm = function () {
                 e.preventDefault();
             } else if (e.target.classList.contains('userform__save-button')) {
                 _this.onClickSaveButton(e);
+                e.preventDefault();
+            } else if (e.target.classList.contains('userform__add-button')) {
+                _this.onClickaddButton(e);
                 e.preventDefault();
             }
         });
@@ -658,6 +705,14 @@ var UserForm = function () {
         value: function onClickSaveButton(event) {
             event.preventDefault();
             this._saveUser();
+        }
+    }, {
+        key: 'onClickaddButton',
+        value: function onClickaddButton(event) {
+            event.preventDefault();
+            this._elem.dispatchEvent(new CustomEvent('user-add', {
+                bubble: true
+            }));
         }
     }, {
         key: 'openUser',
@@ -739,10 +794,15 @@ var UsersList = function () {
     _createClass(UsersList, [{
         key: "onAddClick",
         value: function onAddClick(event) {
+            event.preventDefault();
+
+            for (var i = 0; i < this.elemCollection.length; i++) {
+                this.elemCollection[i].classList.remove('active');
+            }
+
             this._elem.dispatchEvent(new CustomEvent('user-add', {
                 bubbles: true
             }));
-            event.preventDefault();
         }
     }, {
         key: "onClick",
@@ -782,9 +842,8 @@ var UsersList = function () {
                 this.elemCollection[this.elemCollection.length - 1].classList.add('active');
                 return;
             }
-
             for (var i = 0; i < this._users.length; i++) {
-                if (this._users[i] === user) {
+                if (this._users[i]._id === user._id) {
                     if (action === 'delete') {
                         this._users.splice(i, 1);
                         var elem = this.elemCollection[i + 1] || this.elemCollection[i - 1] || null;
@@ -839,12 +898,12 @@ exports.default = UsersList;
 
 var pug = __webpack_require__(0);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИнформация\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (item) {pug_html = pug_html + "\u003Cdiv class=\"user-form col-lg-9\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EИнформация о личности\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
 if (item) {
-pug_html = pug_html + "\u003Cform\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"fullName\""+pug.attr("value", item.fullName, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EEmail\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"email\" name=\"email\""+pug.attr("value", item.email, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\" type=\"button\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\" type=\"submit\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E";
+pug_html = pug_html + "\u003Cform\u003E\u003Cdiv class=\"col-lg-3 text-center\"\u003E\u003Cimg" + (" class=\"img-responsive img-thumbnail\""+pug.attr("src", item.avatarUrl, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"col-lg-9\"\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EИмя\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"fullName\""+pug.attr("value", item.fullName, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EEmail\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"email\" name=\"email\""+pug.attr("value", item.email, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EДата рождения\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"birthdate\""+pug.attr("value", item.birthdate, true, true)+" id=\"datetimepicker4\"") + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"form-group\"\u003E\u003Clabel class=\"col-2 col-form-label\"\u003EEmail\u003C\u002Flabel\u003E\u003Cinput" + (" class=\"userform__input form-control\""+" type=\"text\" name=\"address\""+pug.attr("value", item.address, true, true)) + "\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"userform__buttons text-right\"\u003E\u003Cbutton class=\"userform__delete-button btn btn-default btn-danger\" type=\"button\"\u003EУдалить\u003C\u002Fbutton\u003E\u003Cbutton class=\"userform__save-button btn btn-default btn-success\" type=\"submit\"\u003EСохранить\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fform\u003E";
 }
 else {
-pug_html = pug_html + "Выберите или создайте пользователя";
+pug_html = pug_html + "\u003Cdiv class=\"text-center\"\u003E\u003Cbutton class=\"userform__add-button btn btn-default btn-success btn-lg\" type=\"submit\"\u003EСоздать личность\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E";
 }
 pug_html = pug_html + "\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"item" in locals_for_with?locals_for_with.item:typeof item!=="undefined"?item:undefined));;return pug_html;};
 module.exports = template;
@@ -855,14 +914,14 @@ module.exports = template;
 
 var pug = __webpack_require__(0);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EПользователи" + (pug.escape(null == (pug_interp = ' ') ? "" : pug_interp)) + "\u003Cbutton class=\"btn-default btn btn-xs pull-right\" type=\"button\" data-attach-add\u003E\u003Cspan class=\"glyphicon glyphicon-plus\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E";
-if (items.length !== 0) {
-pug_html = pug_html + "\u003Cul class=\"nav nav-pills nav-stacked\"\u003E" + (null == (pug_interp = __webpack_require__(1).call(this, locals)) ? "" : pug_interp) + "\u003C\u002Ful\u003E";
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cdiv class=\"user-list col-lg-3\"\u003E\u003Cdiv class=\"panel panel-default\"\u003E\u003Cdiv class=\"panel-heading\"\u003EЛичности" + (pug.escape(null == (pug_interp = ' ') ? "" : pug_interp)) + "\u003Cbutton class=\"btn-default btn btn-xs pull-right\" type=\"button\" data-attach-add\u003E\u003Cspan class=\"glyphicon glyphicon-plus\"\u003E\u003C\u002Fspan\u003E\u003C\u002Fbutton\u003E\u003C\u002Fdiv\u003E\u003Cdiv class=\"panel-body\"\u003E\u003Cul class=\"nav nav-pills nav-stacked\"\u003E";
+if (items.length === 0) {
+pug_html = pug_html + "\u003Cli\u003EЛичности отсутствуют\u003C\u002Fli\u003E";
 }
 else {
-pug_html = pug_html + "Пользователи отсутствуют";
+pug_html = pug_html + (null == (pug_interp = __webpack_require__(1).call(this, locals)) ? "" : pug_interp);
 }
-pug_html = pug_html + "\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
+pug_html = pug_html + "\u003C\u002Ful\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E\u003C\u002Fdiv\u003E";}.call(this,"items" in locals_for_with?locals_for_with.items:typeof items!=="undefined"?items:undefined));;return pug_html;};
 module.exports = template;
 
 /***/ }),

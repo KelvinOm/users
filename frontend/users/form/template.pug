@@ -1,9 +1,12 @@
 .user-form.col-lg-9
     .panel.panel-default
-        .panel-heading Информация
+        .panel-heading Информация о личности
         .panel-body
             if item
                 form
+                  .col-lg-3.text-center
+                    img(class='img-responsive img-thumbnail' src=item.avatarUrl)
+                  .col-lg-9
                     .form-group
                         label(class='col-2 col-form-label') Имя
                         input(
@@ -20,8 +23,27 @@
                               value=item.email
                               class='userform__input form-control'
                             )
+                    .form-group
+                        label(class='col-2 col-form-label') Дата рождения
+                        input(
+                              type='text'
+                              name='birthdate'
+                              value=item.birthdate
+                              class='userform__input form-control'
+                              id='datetimepicker4'
+                            )
+                    .form-group
+                        label(class='col-2 col-form-label') Email
+                        input(
+                              type='text'
+                              name='address'
+                              value=item.address
+                              class='userform__input form-control'
+                            )
                     .userform__buttons.text-right
                         button(class='userform__delete-button btn btn-default btn-danger' type="button") Удалить
                         button(class='userform__save-button btn btn-default btn-success' type="submit") Сохранить
             else
-                | Выберите или создайте пользователя
+                .text-center
+                    button(class='userform__add-button btn btn-default btn-success btn-lg' type="submit") Создать личность
+                //- | Создайте личность
